@@ -7,6 +7,18 @@
     "core:default",
     "fs:default",
     {
+      "identifier": "fs:allow-exists",
+      "allow": [{ "path": "$APPDATA/books/*" }]
+    },
+    {
+      "identifier": "fs:allow-read",
+      "allow": [{ "path": "$APPDATA/books/*" }]
+    },
+    {
+      "identifier": "fs:allow-open",
+      "allow": [{ "path": "$APPDATA/books/*" }]
+    },
+    {
       "identifier": "fs:scope-appconfig-recursive",
       "allow": [
         {

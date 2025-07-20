@@ -26,6 +26,9 @@ import { checkForAppUpdates, checkAppReleaseNotes } from '@/helpers/updater';
 import { FILE_ACCEPT_FORMATS, SUPPORTED_FILE_EXTS } from '@/services/constants';
 import { impactFeedback } from '@tauri-apps/plugin-haptics';
 import { getCurrentWebview } from '@tauri-apps/api/webview';
+import { readDir } from '@tauri-apps/plugin-fs';
+import { exists, mkdir, BaseDirectory } from '@tauri-apps/plugin-fs';
+import { appDataDir } from '@tauri-apps/api/path';
 
 import { useEnv } from '@/context/EnvContext';
 import { useAuth } from '@/context/AuthContext';
@@ -57,6 +60,8 @@ import LibraryHeader from './components/LibraryHeader';
 import Bookshelf from './components/Bookshelf';
 import useShortcuts from '@/hooks/useShortcuts';
 import DropIndicator from '@/components/DropIndicator';
+
+const BOOK_DIR = 'books';
 
 const LibraryPageWithSearchParams = () => {
   const searchParams = useSearchParams();
@@ -433,8 +438,14 @@ const LibraryPageContent = ({ searchParams }: { searchParams: ReadonlyURLSearchP
   };
 
   const selectFilesTauri = async () => {
+    const appDataDirPath = await appDataDir();
     const exts = appService?.isMobileApp ? [] : SUPPORTED_FILE_EXTS;
-    const files = (await appService?.selectFiles(_('Select Books'), exts)) || [];
+    let entries = (await readDir(BOOK_DIR, {baseDir: BaseDirectory.AppData})) || [];
+    let files: string[] = [];
+
+    entries = entries.filter((item) => !item.isDirectory);
+    files = entries.map((item) => appDataDirPath + `/${BOOK_DIR}/` + item.name);
+
     if (appService?.isIOSApp) {
       return files.filter((file) => {
         const fileExt = file.split('.').pop()?.toLowerCase() || 'unknown';
@@ -616,9 +627,11 @@ const LibraryPageContent = ({ searchParams }: { searchParams: ReadonlyURLSearchP
   const handleImportBooks = async () => {
     setIsSelectMode(false);
     console.log('Importing books...');
+    const dirExists = await exists(BOOK_DIR, {baseDir: BaseDirectory.AppData});
     let files;
 
     if (isTauriAppPlatform()) {
+      if(!dirExists) await mkdir(BOOK_DIR, {baseDir: BaseDirectory.AppData});
       files = (await selectFilesTauri()) as string[];
     } else {
       files = (await selectFilesWeb()) as File[];
