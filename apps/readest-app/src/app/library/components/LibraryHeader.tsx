@@ -15,13 +15,12 @@ import { useLibraryStore } from '@/store/libraryStore';
 import { useResponsiveSize } from '@/hooks/useResponsiveSize';
 import { useSafeAreaInsets } from '@/hooks/useSafeAreaInsets';
 import { useTrafficLightStore } from '@/store/trafficLightStore';
-import { navigateToLibrary } from '@/utils/nav';
+import { navigateToDownload, navigateToLibrary } from '@/utils/nav';
 import { debounce } from '@/utils/debounce';
 import useShortcuts from '@/hooks/useShortcuts';
 import WindowButtons from '@/components/WindowButtons';
 import Dropdown from '@/components/Dropdown';
 import SettingsMenu from './SettingsMenu';
-import ImportMenu from './ImportMenu';
 import ViewMenu from './ViewMenu';
 
 interface LibraryHeaderProps {
@@ -171,20 +170,15 @@ const LibraryHeader: React.FC<LibraryHeaderProps> = ({
               </button>
             )}
             <span className='bg-base-content/50 mx-2 h-4 w-[0.5px]'></span>
-            <Dropdown
+            <button
               className={clsx(
                 'exclude-title-bar-mousedown dropdown-bottom flex h-6 cursor-pointer justify-center',
                 appService?.isMobile ? 'dropdown-end' : 'dropdown-center',
               )}
-              buttonClassName='p-0 h-6 min-h-6 w-6 flex items-center justify-center'
-              toggleButton={
-                <div className='lg:tooltip lg:tooltip-bottom' data-tip={_('Import Books')}>
-                  <PiPlus className='m-0.5 h-5 w-5' />
-                </div>
-              }
+              onClick={() => {navigateToDownload(router)}}
             >
-              <ImportMenu onImportBooks={onImportBooks} />
-            </Dropdown>
+              <PiPlus className='m-0.5 h-5 w-5' />
+            </button>
             {appService?.isMobile ? null : (
               <button
                 onClick={onToggleSelectMode}

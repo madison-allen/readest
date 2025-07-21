@@ -82,3 +82,7 @@ export const navigateToLibrary = (
 export const redirectToLibrary = () => {
   redirect('/library');
 };
+
+export const navigateToDownload = (router: ReturnType<typeof useRouter>) => {
+  router.push('/download')
+};
